@@ -39,10 +39,17 @@ flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
 ## Next Steps
 
-1. **Commit and push these changes:**
+1. **Update package-lock.json locally (IMPORTANT):**
+   ```bash
+   cd frontend
+   npm install --legacy-peer-deps
+   cd ..
+   ```
+
+2. **Commit and push these changes:**
    ```bash
    git add .
-   git commit -m "fix: CI configuration and add .gitignore"
+   git commit -m "fix: CI configuration, .gitignore, and update package-lock.json"
    git push origin main
    ```
 
