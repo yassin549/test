@@ -23,7 +23,7 @@ describe('Betting Flow', () => {
     const betInput = screen.getByRole('spinbutton');
     fireEvent.change(betInput, { target: { value: '100' } });
 
-    const placeBetButton = screen.getByText(/Place Bet/i);
+    const placeBetButton = screen.getByRole('button', { name: /Place Bet \(100 TND\)/i });
     fireEvent.click(placeBetButton);
 
     expect(mockOnPlaceBet).toHaveBeenCalledWith(100, undefined);
@@ -41,7 +41,7 @@ describe('Betting Flow', () => {
       />
     );
 
-    const cashOutButton = screen.getByText(/Cash Out/i);
+    const cashOutButton = screen.getByRole('button', { name: /Cash Out \(2\.50x/i });
     expect(cashOutButton).toBeInTheDocument();
     expect(cashOutButton).toHaveTextContent('2.50x');
   });
@@ -79,7 +79,7 @@ describe('Betting Flow', () => {
     const betInput = screen.getByRole('spinbutton');
     fireEvent.change(betInput, { target: { value: '100' } });
 
-    const placeBetButton = screen.getByText(/Place Bet/i);
+    const placeBetButton = screen.getByRole('button', { name: /Place Bet \(100 TND\)/i });
     fireEvent.click(placeBetButton);
 
     expect(mockOnPlaceBet).not.toHaveBeenCalled();
@@ -101,7 +101,7 @@ describe('Betting Flow', () => {
     const autoCashoutInput = screen.getByPlaceholderText('2.00');
     fireEvent.change(autoCashoutInput, { target: { value: '3.5' } });
 
-    const placeBetButton = screen.getByText(/Place Bet/i);
+    const placeBetButton = screen.getByRole('button', { name: /Place Bet/i });
     fireEvent.click(placeBetButton);
 
     expect(mockOnPlaceBet).toHaveBeenCalledWith(50, 3.5);

@@ -46,10 +46,17 @@ flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
    cd ..
    ```
 
-2. **Commit and push these changes:**
+2. **Run tests locally to verify:**
+   ```bash
+   cd frontend
+   npm run test
+   cd ..
+   ```
+
+3. **Commit and push these changes:**
    ```bash
    git add .
-   git commit -m "fix: CI configuration, .gitignore, and update package-lock.json"
+   git commit -m "fix: CI tests and add missing type definitions"
    git push origin main
    ```
 
