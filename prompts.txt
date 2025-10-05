@@ -1,0 +1,800 @@
+Prompt 1 — Repo scaffold, environment & CI (polished, production-ready)
+
+Goal — Create a robust monorepo scaffold for the Aviator app (frontend, backend, infra) with reproducible dev environment, Docker compose, and a CI pipeline that lints, tests and builds artifacts.
+
+Instructions for the AI code editor (run as a single task):
+
+Create repo root structure
+
+/README.md
+/docker-compose.yml
+/.github/workflows/ci.yml
+/frontend/               # Next.js + TS + Tailwind
+/backend/                # Django + DRF + Channels
+/infra/                  # nginx, certs, k8s manifests (stubs)
+/scripts/                # dev helpers (start, test, build)
+.env.example
+
+
+Frontend bootstrap
+
+Create a Next.js + TypeScript app in /frontend.
+
+Add Tailwind CSS configured to use design tokens (we'll fill tokens in Prompt 2).
+
+Add ESLint + Prettier + Husky pre-commit hook.
+
+package.json scripts: dev, build, start, lint, test.
+
+Add src/pages/_app.tsx that imports global CSS.
+
+Backend bootstrap
+
+Create a Django project config and app core inside /backend.
+
+Use Django REST Framework, channels, psycopg2-binary, django-environ.
+
+Create requirements.txt or pyproject.toml.
+
+Add manage.py and a simple api/health/ endpoint.
+
+Create backend/.env.example with: DJANGO_SECRET, DATABASE_URL, REDIS_URL, NOWPAYMENTS_API_KEY, NOWPAYMENTS_WEBHOOK_SECRET, FRONTEND_URL.
+
+Infra & Docker
+
+docker-compose.yml with services: frontend, backend, postgres, redis, nginx (reverse proxy).
+
+Healthchecks and sensible resource limits.
+
+infra/production.yaml stub for k8s or docker stack.
+
+CI pipeline
+
+.github/workflows/ci.yml:
+
+Run on push/PR to main.
+
+Steps: checkout, setup node & python, install deps, run npm run lint, flake8, npm test, pytest, build docker images (optional).
+
+Save artifacts (frontend build, backend static assets).
+
+README
+
+Clear dev steps:
+
+cp .env.example .env
+
+docker-compose up --build
+
+Visit http://localhost:3000
+
+Minimal troubleshooting tips.
+
+Files to create (explicit):
+
+frontend/package.json, frontend/tsconfig.json, frontend/tailwind.config.js
+
+backend/requirements.txt, backend/manage.py, backend/config/settings.py (sane defaults)
+
+docker-compose.yml
+
+.github/workflows/ci.yml
+
+README.md, .env.example, /scripts/start-dev.sh
+
+Acceptance criteria (automatable):
+
+docker-compose up --build starts frontend on :3000 and backend on :8000 (healthcheck endpoints respond 200).
+
+CI workflow file exists and runs linter & tests locally via commands above.
+
+Testing checklist:
+
+Run docker-compose up and confirm both apps respond.
+
+Run npm run lint and flake8 with no fatal errors (warnings allowed).
+
+Polish notes:
+
+Use semantic commit messages.
+
+Include a CODE_OF_CONDUCT.md and CONTRIBUTING.md scaffold.
+
+Make the README developer-friendly and timeline-oriented (MVP phases).
+
+Prompt 2 — Design system, Tailwind tokens & LoadingAviator component (pixel-perfect & accessible)
+
+Goal — Implement the design system and global styles, including accessible, reduced-motion-aware loading animation component used across the app.
+
+Instructions (single task):
+
+Design tokens
+
+Add frontend/src/styles/design-tokens.css with CSS variables:
+
+:root{
+  --bg: #0B0E14;
+  --surface: #0F1720;
+  --text: #E6EEF8;
+  --primary: #2B6FFF;
+  --accent: #8A3FFC;
+  --amber: #FFB02E;
+  --success: #20D07A;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-soft: 0 10px 30px rgba(11,14,20,0.6);
+  --motion-quick: 90ms;
+  --motion-short: 160ms;
+  --motion-medium: 320ms;
+}
+
+
+Tailwind config
+
+Map tokens to Tailwind theme in tailwind.config.js.
+
+Enable JIT, add safelist for dynamic classes.
+
+Add plugin to handle fluid type scales.
+
+Typography
+
+Add @import for Outfit:700 (headings) and Inter (body) in globals.css.
+
+Set base font sizes to be slightly condensed for compactness.
+
+UI primitives
+
+Create frontend/src/components/ui/:
+
+Button.tsx — pill-shaped, variants: primary, ghost, danger. Accept loading prop.
+
+Card.tsx — glass-like translucent surface, multi-layer shadow, optional elevate prop.
+
+Icon.tsx — accessible wrapper for SVG icons with title and aria-hidden.
+
+LoadingAviator component
+
+Add LoadingAviator.tsx using the SVG provided earlier.
+
+Ensure:
+
+role="status", aria-live="polite".
+
+Respects prefers-reduced-motion.
+
+Accepts size, label props.
+
+Add FullPageLoader layout wrapper with subtle backdrop blur.
+
+Global reduced-motion toggle
+
+Implement a small useMotionPreference hook that toggles a class on <html> and persists to localStorage.
+
+Add an accessible control in a settings drawer (deferred to Prompt 10 but include the hook now).
+
+Files to produce:
+
+frontend/src/styles/design-tokens.css
+
+frontend/tailwind.config.js
+
+frontend/src/components/ui/{Button.tsx,Card.tsx,Icon.tsx,LoadingAviator.tsx}
+
+Update _app.tsx to include tokens.
+
+Acceptance criteria:
+
+LoadingAviator renders identically to the spec; toggling prefers-reduced-motion disables animations.
+
+Buttons and cards reflect color tokens and border-radius.
+
+No accessibility violations for the component (role set, text alternatives present).
+
+Polish & modern touches:
+
+Glass blur uses backdrop-filter with graceful fallback.
+
+Button micro-interactions: 3D press, fast/short transitions based on motion tokens.
+
+Export tokens to design/tokens.json for designers.
+
+Prompt 3 — Landing & Onboarding (Demo-first, frictionless, modern microcopy)
+
+Goal — Implement a beautiful, mobile-first landing page and frictionless demo onboarding (no signup), plus a polished real-account skeleton (email or wallet).
+
+Instructions (single task):
+
+Landing layout (/pages/index.tsx)
+
+Hero: short headline + subline:
+
+Headline: “Aviator — Fast, Social, Trust-First”.
+
+Subline: “Try the demo instantly or play for real with crypto deposits (NowPayments).”
+
+Two primary CTAs as rounded pills:
+
+Try Demo — filled --primary.
+
+Play Real — ghost or outline with accent gradient.
+
+Right side: tiny live demo tile — looped inline SVG plane flight (3–5s loop) with soft drop shadow and rounded card; clicking the tile opens demo.
+
+Microcopy
+
+Payment hint below CTAs: small muted text "Crypto deposits via NowPayments. Card & local rails coming soon."
+
+Add a persuasive trust line: small row with badges: “No KYC required to play · Min payout 50 TND · Provably-fair”.
+
+Demo onboarding (instant)
+
+On Try Demo:
+
+Create a ephemeral session: generate demo_user_id and demo_seed.
+
+Seed demo balance (configurable; default 5000.00 TND).
+
+Persist session to localStorage (aviator_demo_session).
+
+Redirect to /game?mode=demo.
+
+The demo user object: { id, displayName: "Guest-XXXX", balance_tnd: 5000.00, created_at, isDemo: true }.
+
+Real onboarding (lightweight)
+
+/auth/signup modal/page with:
+
+Email entry + magic link or passwordless flow (preferred).
+
+OR Wallet Connect button (UI stub now; add integration later).
+
+On success, minimal profile created and redirect to /game?mode=real.
+
+Show a short tooltip: “No KYC at signup — add verification later.”
+
+Polish
+
+Use micro-animations: CTA hover lift (motion-short), tactile button press.
+
+Add motion-reduced fallback.
+
+Add minimal SEO tags and social preview OG image (simple gradient + plane).
+
+Files to create:
+
+frontend/src/pages/index.tsx, frontend/src/pages/auth/signup.tsx
+
+frontend/src/lib/demo-session.ts (helper to create/persist demo user)
+
+Acceptance:
+
+Clicking Try Demo immediately lands on /game with demo session active and demo balance displayed.
+
+Real signup collects an email and creates a user object; no KYC required.
+
+Testing checklist:
+
+Confirm localStorage entry exists and is restored on subsequent visits.
+
+Confirm UX works on narrow mobile widths: CTA and demo tile visible and tappable.
+
+Prompt 4 — Core Aviator Game UI (pixel-perfect, mobile-first)
+
+Goal — Build the main game UI: top bar, central flight canvas and multiplier, bet card (sticky on mobile), social/info panel, and required micro-interactions. Make it feel like a premium mobile app.
+
+Instructions (single task):
+
+Layout
+
+Create frontend/src/pages/game.tsx with three-region layout (mobile-first):
+
+Top bar (fixed): logo (left), balance center (TND + small crypto equivalent), Deposit CTA (right), avatar menu.
+
+Main center: GameCard containing GameCanvas (plane animation) and large multiplier display (big typographic scale).
+
+Bottom sticky: BetCard with amount input, preset chips, payment method selector, auto-cashout, and big pill action.
+
+Right/slide-up panel: SocialPanel (chat tabs: All / Bets / System) and winners reel.
+
+Components
+
+GameCanvas.tsx:
+
+Show plane path, moving background, and multiplier overlay.
+
+Pre-round state shows countdown as large number with subtle pulse. Use --motion-medium for animations.
+
+During flight, multiplier numeric tween from 1.00x upwards using requestAnimationFrame and an easing that mimics real aviator dynamics (slightly exponential).
+
+On crash, play a 240ms crash animation where plane falls and multiplier flashes red; show CRASHED state with final multiplier.
+
+MultiplierDisplay.tsx:
+
+Huge, friendly number using Outfit with neon-like gradient and soft amber glow for win states.
+
+Use aria-live="polite" for screen readers updating the multiplier.
+
+BetCard.tsx:
+
+Amount input with preset chips (10/50/100/500) and editable chips.
+
+Payment method selector default: Crypto (NowPayments) — show small coin icons.
+
+Auto-cashout input: accepts multiplier or percent; show validation.
+
+Primary pill button: Place Bet. When round is live and user has an active bet, transform to Cash Out with amber background and micro-vibration effect on long press (mobile).
+
+Accessible keyboard controls: Enter to Place Bet, Space to Cash Out (when appropriate).
+
+SocialPanel.tsx:
+
+Minimal chat with moderation controls for admin (mute/delete) — skeleton for now.
+
+Recent winners reel with animated tiles flipping on new winners.
+
+Interaction details
+
+Place bet deducts immediately from balance (show animated deduction).
+
+Cashout increases balance instantly (animated counter + confetti if big win).
+
+All animations obey reduced-motion setting.
+
+Styling & polish
+
+Use glass card surfaces, multi-layer soft shadow, and 12–16px rounded corners.
+
+Buttons: pill CTA with subtle gradient using --primary -> --accent.
+
+Multiplier type scale: responsive size: mobile 40–64px, tablet 80–120px, desktop 120–180px.
+
+Provide tooltip microcopy for first-time players: “Place bet → Cash out before the plane crashes to lock multiplier.”
+
+Files to produce:
+
+frontend/src/components/game/{GameCanvas.tsx,MultiplierDisplay.tsx,BetCard.tsx,SocialPanel.tsx}
+
+Update game.tsx route to compose these.
+
+Acceptance criteria:
+
+On demo rounds, UI flows through countdown → flight → crash. Place Bet and Cash Out behave correctly and update demo balance.
+
+Keyboard and screen reader announcements work correctly for multiplier and round status.
+
+Testing checklist:
+
+Place a bet and cash out during the simulated round; verify balance animations and ledger updates (frontend-only for now).
+
+Prompt 5 — Simulated rounds engine & WebSocket protocol (deterministic + provably-fair)
+
+Goal — Build a robust, server-driven rounds engine for production plus a deterministic client fallback for demo locals. Include provably-fair flow (pre-round hash/reveal).
+
+Instructions (single task):
+
+Backend rounds engine
+
+Implement backend/games/ service:
+
+Model: Round(id, server_seed_hash, server_seed_revealed, start_time, state, crash_multiplier, created_at).
+
+Round lifecycle: PRE_ROUND (10s) → FLYING → CRASH (computed multiplier).
+
+Each round generate a secure random server_seed, compute server_hash = HMAC_SHA256(server_seed, server_secret) and publish server_hash at PRE_ROUND start.
+
+Crash multiplier derived from server_seed + client_salt algorithm; deterministic and reproducible.
+
+WebSocket channel (/ws/rounds/):
+
+Broadcast events: round:pre (hash, countdown), round:tick (multiplier), round:crash (final multiplier + seed reveal).
+
+Use Django Channels + Redis pub/sub for scale.
+
+Frontend fallback (demo)
+
+Implement deterministic JS simulator using seeded PRNG (seed from demo_seed) that mimics server messages and publishes identical event structure on a local EventEmitter.
+
+Provide UI to view server_hash pre-round and reveal seed after round for verification.
+
+Provably-fair UI
+
+Add a RoundProof small component in GameCard showing:
+
+Pre-round: Hash: <xxxx>
+
+Post-round: Seed: <xxxx> and a button Verify that runs local verification (hash(seed) === preHash).
+
+Provide copy & explanation microcopy: “Click verify to confirm the round was fair.”
+
+Telemetry & resilience
+
+Round events must include server timestamp and event nonce.
+
+Ensure websocket reconnection logic and replay of last known round state.
+
+Files to create:
+
+backend/games/models.py, backend/games/consumers.py (channels consumer), backend/games/services.py
+
+frontend/src/lib/rounds-simulator.ts, frontend/src/components/game/RoundProof.tsx
+
+Acceptance:
+
+Backend emits pre-round hash and later the seed; frontend can verify the hash matches.
+
+Demo mode uses seeded local simulator and displays identical proof UI.
+
+Testing checklist:
+
+Run a few rounds and verify the hash/seed verification passes repeatedly.
+
+Prompt 6 — Bets, bets resolution & balance ledger (robust accounting)
+
+Goal — Implement backend betting endpoints, bet lifecycle management, secure balance ledger (atomic updates), and frontend integration for placing bets and cashouts.
+
+Instructions (single task):
+
+Backend models
+
+Create models: User, Bet(id,user,round,amount_tnd,placed_at,auto_cashout_multiplier,cashed_out_at,cashed_out_multiplier,win_amount_tnd,status), LedgerEntry(id,user,type,amount_tnd,balance_before,balance_after,meta,timestamp).
+
+Atomic operations
+
+Use DB-level transactions when:
+
+placing a bet: check balance, create Bet, debit balance, create ledger entry BET_PLACE.
+
+cashout: compute payout, credit balance, create BET_CASHOUT ledger entry.
+
+round end: process outstanding bets (use job/task) and create BET_SETtlement entries for those who didn't cashout.
+
+API endpoints
+
+POST /api/bets/ — place bet (user auth required). Validate min/max, ensure balance sufficiency.
+
+POST /api/bets/{bet_id}/cashout/ — cash out an active bet; idempotent checks.
+
+GET /api/balances/ — returns { balance_tnd, balance_minor_units, crypto_equivalents: [{coin, amount, rate_timestamp}] }.
+
+Events: on each balance change emit websocket user:balance:update.
+
+Frontend integration
+
+Hook bet placement UI to call POST /api/bets/. Show optimistic state (deduct) and rollback on error.
+
+Cashout triggers POST /api/bets/{id}/cashout/. UI shows an animated success; update ledger view.
+
+Security & validation
+
+Server must validate that cashout multiplier is <= current multiplier and that bet is active.
+
+Use idempotency keys for bet placement (optional but recommended).
+
+Acceptance & invariants
+
+The ledger must never allow negative balance.
+
+All balance changes must generate ledger entries.
+
+Bets are immutable after final settlement (set fields and status).
+
+Files to create:
+
+backend/games/models.py (Bet + Ledger), backend/games/views.py, backend/games/serializers.py, tasks in backend/games/tasks.py.
+
+Testing checklist:
+
+Unit tests for bet placement, cashout, and settlement ensuring ledger integrity (no negative balances).
+
+Integration test simulating placing a bet, flying to multiplier, cashout, and verifying final balance.
+
+Prompt 7 — NowPayments integration + Deposit modal (secure & delightful)
+
+Goal — Implement a secure backend integration with NowPayments (create invoice + webhook) and a modern frontend deposit modal with QR, TTL ring, confirmations tracker and UX micro-interactions.
+
+Instructions (single task):
+
+Backend
+
+POST /api/deposits/create/:
+
+Accepts user_id, amount_tnd, preferred_coin.
+
+Convert TND to selected coin using an external rate provider (mock in dev), call NowPayments create invoice API, store invoice with: invoice_id, pay_address, amount_crypto, amount_tnd, ttl, required_confirmations, status, created_at, rate_used.
+
+POST /api/deposits/webhook/:
+
+Verify webhook signature using NOWPAYMENTS_WEBHOOK_SECRET.
+
+Map NowPayments statuses to local: waiting -> pending, confirmed -> completed, expired -> expired.
+
+On completed, credit user amount_tnd (atomic), create ledger DEPOSIT_CREDIT, emit user:balance:update via websocket.
+
+GET /api/deposits/{id} for frontend polling.
+
+Frontend Deposit Modal
+
+DepositModal.tsx:
+
+Payment method selector canvas; default shows Crypto (NowPayments).
+
+List coins with icons (BTC, ETH, USDT).
+
+On create: call /api/deposits/create/ and render Invoice card:
+
+QR (click to fullscreen)
+
+Address with copy button (copy toast Copied!)
+
+TTL: show radial expiry ring animation synchronized to ttl seconds (CSS + JS tick)
+
+Confirmations tracker: 0/required with progress bar
+
+“Open in wallet” deep link (if applicable)
+
+On success (webhook credit), play animated balance + confetti; show Deposit Complete — +X TND.
+
+UX edge cases
+
+If invoice expires: show CTA Create new deposit with preserved amount.
+
+If wrong coin sent: show explicit error microcopy: “Wrong coin sent? Contact support — recovery may not be possible.”
+
+Security
+
+Do not expose NOWPAYMENTS_API_KEY on client.
+
+Webhook endpoint must validate signature and origin.
+
+Acceptance
+
+Create deposit returns invoice with required fields. Simulated webhook marks deposit completed and user balance updates in UI.
+
+Files to create:
+
+backend/payments/nowpayments.py (client wrapper), routes, webhook handler.
+
+frontend/src/components/deposit/DepositModal.tsx, InvoiceCard.tsx.
+
+Testing checklist:
+
+Unit test webhook signature verification and deposit status transitions.
+
+E2E simulation that calls deposit create then posts test webhook and sees UI update.
+
+Prompt 8 — Withdraw/Payout requests & Transactions ledger UI (safe, auditable)
+
+Goal — Implement user withdraw/payout request flow (min 50 TND), backend validation, transaction ledger, and admin-facing request actions. Ensure clarity in user messaging and prevent abuse.
+
+Instructions (single task):
+
+Frontend Withdraw page
+
+/withdraw:
+
+Form fields:
+
+Amount (number) — inline validation >= 50 and <= available balance.
+
+Method — Crypto or Bank/Local (for now, both forms available; show fields dynamically).
+
+Destination — crypto address or IBAN-like fields with labels.
+
+Note (optional).
+
+Submit button with confirmation modal: show hold amount and resulting balance.
+
+After submit: display in Profile -> Transactions with Pending status.
+
+Backend
+
+POST /api/payouts/:
+
+Validate min_payout (from settings; default 50 TND) and balance sufficiency.
+
+Deduct or place a hold on user balance by creating ledger entry PAYOUT_HOLD.
+
+Create PayoutRequest(id,user,amount_tnd,destination,note,status=pending,created_at).
+
+Admin endpoints in Prompt 9 handle processing and completion.
+
+GET /api/transactions/ listing ledger entries.
+
+Ledger design
+
+LedgerEntry fields must include balance_before and balance_after, type (DEPOSIT, BET_PLACE, BET_CASHOUT, PAYOUT_HOLD, PAYOUT_COMPLETE, ADJUSTMENT), and a meta JSON for contextual details.
+
+User messaging
+
+Inline helper copy: “Minimum payout is 50 TND. Requests are processed manually by our team.”
+
+On insufficient balance: block submit and show helpful tips (e.g., Deposit link).
+
+Acceptance
+
+Payout request created if >= 50 TND, ledger shows hold, and request visible in admin.
+
+Files to create:
+
+frontend/src/pages/withdraw.tsx, frontend/src/components/transactions/TransactionsList.tsx
+
+backend/payments/models.py additions and backend/payments/views.py.
+
+Testing checklist:
+
+Attempt payout under 50 TND — must be blocked both client & server.
+
+Create payout >= 50 — ledger shows hold and balance reduced accordingly.
+
+Prompt 9 — Admin dashboard (responsive, efficient ops)
+
+Goal — Create a secure, ergonomic admin dashboard to manage users, deposits, payouts, and game operations with CSV export and audit trails. Make the UI clean, fast, and data-dense but uncluttered.
+
+Instructions (single task):
+
+Auth & security
+
+Admin user role built into backend. Protect admin routes with strong auth (JWT or session) and require is_staff.
+
+Add 2FA recommendation in README (not mandatory for MVP but recommended).
+
+Backend endpoints
+
+GET /api/admin/users/ (filterable/searchable by email/username/status).
+
+GET /api/admin/deposits/
+
+GET /api/admin/payouts/
+
+POST /api/admin/payouts/{id}/mark-processing
+
+POST /api/admin/payouts/{id}/mark-completed
+
+POST /api/admin/payouts/{id}/reject (with note).
+
+GET /api/admin/export/payouts?ids=... — returns CSV.
+
+Frontend admin area
+
+frontend/src/pages/admin/index.tsx with sidebar: Users, Deposits, Payout Requests, Game Stats, Transactions, Settings.
+
+Tables:
+
+Use virtualized table for scalability (react-virtualized).
+
+Rows expandable to show details (ledger, tx hash, IP/session info).
+
+Actions:
+
+Inline Credit / Debit modal for quick balance adjustments (record ledger entries and audit).
+
+Bulk select + bulk action (mark completed).
+
+Activity log for every admin action.
+
+Payout detail view:
+
+Show user-provided destination, allow copy, show Mark Processing, Mark Completed, Reject with reason field.
+
+Analytics
+
+Small charts using Recharts: DAU, deposits, payouts, average bet size.
+
+Filters: date range picker, user filter, coin filter.
+
+Polish
+
+Use consistent color-coding for statuses (pending=amber, completed=success, failed=muted).
+
+Confirmation modals for destructive actions.
+
+Export to CSV button with progress spinner.
+
+Acceptance
+
+Admin can mark a payout completed and ledger & user transaction are updated accordingly; CSV export works for selected items.
+
+Files to create:
+
+frontend/src/pages/admin/*.tsx, backend/admin_views.py, backend/admin_export.py
+
+Testing checklist:
+
+Create a payout as user and observe it in admin; mark completed and verify user sees status updated.
+
+Prompt 10 — Final polish, tests, accessibility, deploy & handover (ship-ready)
+
+Goal — Add final polish, automated tests, accessibility gates, performance tuning, deployment scripts, and handover deliverables to make the app production-ready and designer/developer friendly.
+
+Instructions (single task):
+
+Automated tests
+
+Frontend:
+
+Jest + React Testing Library tests for critical flows: Demo onboarding, Place Bet → Cash Out, Deposit modal UX (copy button, QR fullscreen), LoadingAviator presence.
+
+Backend:
+
+Pytest tests for betting logic, ledger integrity, deposit webhook verification, payout validation.
+
+Add CI steps that run tests and fail builds if critical tests or linters fail.
+
+Accessibility
+
+Add axe-core checks in CI for the main pages (landing, game, deposit modal).
+
+Ensure:
+
+aria-live regions for multiplier and deposit/payout updates.
+
+Focus management for modal open/close and error messages.
+
+Keyboard navigation for all main actions.
+
+Performance & SEO
+
+Server-side render the landing and game shell (Next.js SSR) to reduce TTFB.
+
+Lazy-load heavy components (charts, admin assets).
+
+Optimize images and SVGs; use vector icons.
+
+Security & ops
+
+Ensure all API secret keys only in server env.
+
+Add rate-limiting on auth & deposit create endpoints.
+
+Add simple abuse mitigations: captcha on signup if abnormal behavior, per-user deposit/payout rate limits.
+
+In infra/, add a deploy.sh and sample k8s manifest infra/production.yaml with placeholders.
+
+Monitoring
+
+Add basic logs for critical actions: deposits completed, payout completed, admin actions (to a file or external service stub).
+
+Add error and performance metrics stubs.
+
+Handover deliverables
+
+design/ folder:
+
+export tokens (tokens.json), component list, and Figma-ready frames (assets and specs JSON).
+
+mockups: Landing (mobile & desktop), Game (mobile & tablet & desktop), Deposit modal, Withdraw form, Admin dashboard.
+
+docs/:
+
+OpenAPI spec for all endpoints (bets, deposits, payouts, admin).
+
+Deposit flow state-machine diagram (states & transitions).
+
+Webhook verification sample code block.
+
+Operator checklist (NowPayments secrets, webhook URL, admin creation, 2FA).
+
+release-notes.md summarizing MVP features and known limitations.
+
+Acceptance
+
+All unit tests pass in CI.
+
+Axe accessibility critical rules pass.
+
+README includes deploy and admin ops checklist.
+
+Files to create:
+
+frontend/__tests__/*, backend/tests/*, infra/deploy.sh, design/tokens.json, docs/openapi.yaml, release-notes.md.
+
+Final polish & UX
+
+Animated balance counter for any balance change.
+
+Confetti & shareable victory card for significant wins.
+
+Friendly onboarding tooltip for first-time players.
+
+Provide responsible-play controls in settings and prominent support link.

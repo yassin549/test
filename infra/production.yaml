@@ -1,0 +1,37 @@
+# Placeholder for Kubernetes Production Deployment for Aviator
+# Replace placeholders with your actual values
+  selector:
+    matchLabels:
+      app: aviator-frontend
+  template:
+    metadata:
+      labels:
+        app: aviator-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: your-repo/aviator-frontend:latest
+        ports:
+        - containerPort: 3000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aviator-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aviator-backend
+  template:
+    metadata:
+      labels:
+        app: aviator-backend
+    spec:
+      containers:
+      - name: backend
+        image: your-repo/aviator-backend:latest
+        ports:
+        - containerPort: 8000

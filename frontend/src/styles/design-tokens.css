@@ -1,0 +1,15 @@
+:root {
+  --bg: #0B0E14;
+  --surface: #0F1720;
+  --text: #E6EEF8;
+  --primary: #2B6FFF;
+  --accent: #8A3FFC;
+  --amber: #FFB02E;
+  --success: #20D07A;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-soft: 0 10px 30px rgba(11,14,20,0.6);
+  --motion-quick: 90ms;
+  --motion-short: 160ms;
+  --motion-medium: 320ms;
+}
